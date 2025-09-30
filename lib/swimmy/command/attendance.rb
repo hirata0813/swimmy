@@ -8,7 +8,7 @@ module Swimmy
       command 'hi', 'bye' do |client, data, match|
 
         cmd = match[:command]
-        arg = match[:expression]
+        arg = match[:expression]&.strip
         now = Time.now
         user = client.web_client.users_info(user: data.user).user
         user_id = user.id
@@ -60,7 +60,7 @@ module Swimmy
         active_members = spreadsheet.sheet("members", Swimmy::Resource::Member).fetch.select {|m| m.active? }.map {|m| m.account }
 
         case arg
-        in nil
+        in nil | ""
           # return "do_current_user" if arg is not specified
           return "do_current_user"
         in String => s if active_members.include?(s)
