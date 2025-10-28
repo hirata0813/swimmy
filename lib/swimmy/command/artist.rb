@@ -11,14 +11,14 @@ module Swimmy
           begin 
             spotify = Swimmy::Service::Spotify.new(ENV['SPOTIFY_CLIENT_ID'], ENV['SPOTIFY_CLIENT_SECRET'])
             artist_info = spotify.search(match[:expression])
+
+            # 人気曲は最大10件，関連アーティストは最大5件
+            num_tracks = 10
+            num_related_artists = 5
+            msg = make_artist_message(artist_info, num_tracks, num_related_artists)  
           rescue => e
             msg = "アーティスト情報を取得できませんでした．API認証に失敗した可能性があります．"
           end
-
-          # 人気曲は最大10件，関連アーティストは最大5件
-          num_tracks = 10
-          num_related_artists = 5
-          msg = make_artist_message(artist_info, num_tracks, num_related_artists)  
         end 
         
         client.say(channel: data.channel, text: msg)
