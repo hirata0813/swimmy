@@ -5,6 +5,7 @@ require 'json'
 require 'uri'
 require 'net/https'
 require 'pp'
+require 'fileutils'
 
 module Swimmy
   module Command
@@ -40,6 +41,23 @@ module Swimmy
                          thread_ts: data.thread_ts || data.ts)
             rescue
               message = "写真のアップロードに失敗しました (ファイル名: #{file.name})．"
+              client.say(channel: data.channel, text: message)
+            end
+
+            # Upload to pCloud
+            client.say(channel: data.channel,
+                       text: "pCloud ディレクトリにコピー中 (#{file.name})...",
+                       thread_ts: data.thread_ts || data.ts)
+
+            begin
+              destination_path = File.join(ENV["PCLOUD_MOUNT_PATH"], file.name)
+              File.binwrite(destination_path, blob)
+
+              client.say(channel: data.channel,
+                         text: "コピー完了 #{destination_path}",
+                         thread_ts: data.thread_ts || data.ts)
+            rescue
+              message = "写真のコピーに失敗しました (ファイル名: #{file.name})．"
               client.say(channel: data.channel, text: message)
             end
           end
